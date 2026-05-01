@@ -657,7 +657,6 @@ function drawCell(r, c, sx, sy, cs) {
   // Bounce animation for characters
   if (isChar) {
     const phase = animTime / 750 + r * 0.31 + c * 0.23;
-    ey += Math.sin(phase * Math.PI * 2) * Math.min(3, cs * 0.06);
     ey = sy + cs * 0.42 + Math.sin(phase * Math.PI * 2) * Math.min(3, cs * 0.06);
   }
 
