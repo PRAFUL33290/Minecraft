@@ -9,8 +9,8 @@
 /* === RESET === */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --sidebar-w: 190px;
   --toolbar-h: 54px;
+  --palette-h: 130px;
 }
 html, body {
   height: 100%; overflow: hidden;
@@ -54,45 +54,55 @@ html, body {
 /* === MAIN AREA === */
 #main-area { flex: 1; display: flex; overflow: hidden; position: relative; }
 
-/* === SIDEBAR === */
-#sidebar {
-  width: var(--sidebar-w); flex: 0 0 var(--sidebar-w);
-  background: linear-gradient(180deg, #1A237E, #0D47A1);
-  overflow-y: auto; overflow-x: hidden;
+/* === BOTTOM PALETTE === */
+#palette-bar {
+  flex: 0 0 var(--palette-h);
+  background: linear-gradient(to top, #0D1B7A 0%, #1A237E 100%);
   display: flex; flex-direction: column;
-  border-right: 3px solid #FFD54F; z-index: 5;
+  border-top: 3px solid #FFD54F; z-index: 5;
 }
-#sidebar::-webkit-scrollbar { width: 5px; }
-#sidebar::-webkit-scrollbar-track { background: #0D47A1; }
-#sidebar::-webkit-scrollbar-thumb { background: #FFD54F; border-radius: 3px; }
-
-.palette-section { padding: 6px; }
-.palette-header {
+#palette-tabs {
+  display: flex; gap: 3px; padding: 5px 8px 0;
+  overflow-x: auto; flex-shrink: 0;
+}
+#palette-tabs::-webkit-scrollbar { height: 3px; }
+#palette-tabs::-webkit-scrollbar-track { background: transparent; }
+#palette-tabs::-webkit-scrollbar-thumb { background: rgba(255,213,79,0.5); border-radius: 2px; }
+.palette-tab {
   font-family: 'Press Start 2P', monospace; font-size: 6px;
-  color: #FFD54F; padding: 5px 4px 4px;
-  border-bottom: 2px dotted rgba(255,255,255,0.2);
-  margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 5px 9px; border: none; border-radius: 6px 6px 0 0;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+  transition: background 0.15s, color 0.15s;
 }
-.block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
-.block-item {
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 5px 2px; border-radius: 7px; cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+.palette-tab.active { background: #FFD54F; color: #1A237E; }
+.palette-tab:hover:not(.active) { background: rgba(255,255,255,0.2); color: #fff; }
+#palette-items {
+  flex: 1; display: flex; gap: 6px; padding: 7px 10px;
+  overflow-x: auto; align-items: center;
+}
+#palette-items::-webkit-scrollbar { height: 4px; }
+#palette-items::-webkit-scrollbar-track { background: #0D47A1; }
+#palette-items::-webkit-scrollbar-thumb { background: #FFD54F; border-radius: 2px; }
+.palette-item {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 58px; padding: 5px 4px; border-radius: 7px; cursor: pointer;
   border: 2px solid transparent;
-  background: rgba(255,255,255,0.07); min-height: 52px;
+  background: rgba(255,255,255,0.07);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  flex-shrink: 0;
 }
-.block-item:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
-.block-item.selected {
+.palette-item:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+.palette-item.selected {
   border-color: #FFD54F; background: rgba(255,213,79,0.22);
   box-shadow: 0 0 8px rgba(255,213,79,0.55);
 }
-.block-emoji { font-size: 22px; line-height: 1; }
-.block-item.is-char .block-emoji { animation: bounce 1.6s ease-in-out infinite; }
-.block-label {
+.palette-item .item-emoji { font-size: 24px; line-height: 1; }
+.palette-item.is-char .item-emoji { animation: bounce 1.6s ease-in-out infinite; }
+.palette-item .item-label {
   font-family: 'Press Start 2P', monospace; font-size: 5px;
   color: rgba(255,255,255,0.82); text-align: center;
-  margin-top: 3px; line-height: 1.3; word-break: break-word;
+  margin-top: 3px; line-height: 1.3; word-break: break-word; max-width: 54px;
 }
 
 /* === CANVAS AREA === */
@@ -230,10 +240,12 @@ html, body {
 
 /* === RESPONSIVE === */
 @media (max-width: 600px) {
-  :root { --sidebar-w: 160px; --toolbar-h: 48px; }
+  :root { --toolbar-h: 48px; --palette-h: 115px; }
   .tool-btn { font-size: 6px; padding: 6px 7px; }
   #toolbar h1 { display: none; }
   .scene-grid { grid-template-columns: repeat(2,1fr); }
+  .palette-tab { font-size: 5px; padding: 4px 6px; }
+  .palette-item { min-width: 50px; }
 }
 </style>
 </head>
@@ -249,20 +261,23 @@ html, body {
   </div>
 
   <div id="main-area">
-    <!-- SIDEBAR -->
-    <div id="sidebar"></div>
-
     <!-- CANVAS -->
     <div id="canvas-wrapper">
       <canvas id="main-canvas"></canvas>
     </div>
+  </div>
+
+  <!-- BOTTOM PALETTE -->
+  <div id="palette-bar">
+    <div id="palette-tabs"></div>
+    <div id="palette-items"></div>
   </div>
 </div>
 
 <!-- MINI-MAP -->
 <div id="minimap-wrap">
   <div id="minimap-label">🗺️ Mini-carte</div>
-  <canvas id="minimap-canvas" width="140" height="140"></canvas>
+  <canvas id="minimap-canvas" width="140" height="63"></canvas>
 </div>
 
 <!-- TOAST -->
@@ -341,11 +356,12 @@ html, body {
 //  DEFINITIONS
 // ════════════════════════════════════════════
 
-const GRID_SIZE  = 40;
+const GRID_COLS = 40;
+const GRID_ROWS = 18;
 const BASE_CELL  = 64;
 const MIN_ZOOM   = 0.3;
 const MAX_ZOOM   = 2.0;
-const STORAGE_KEY = 'mon_histoire_pixel_v2';
+const STORAGE_KEY = 'mon_histoire_pixel_v3';
 
 const BLOCK_DEFS = {
   // Décors
@@ -449,7 +465,7 @@ function init() {
   miniCanvas = document.getElementById('minimap-canvas');
   miniCtx    = miniCanvas.getContext('2d');
 
-  buildSidebar();
+  buildPalette();
   resizeCanvas();
 
   const loaded = loadFromStorage();
@@ -460,76 +476,87 @@ function init() {
 }
 
 function initGrid() {
-  grid = Array.from({length: GRID_SIZE}, () => Array(GRID_SIZE).fill(null));
+  grid = Array.from({length: GRID_ROWS}, () => Array(GRID_COLS).fill(null));
+  // Pre-fill bottom 2 rows as ground (Mario Maker style)
+  for (let c = 0; c < GRID_COLS; c++) {
+    grid[GRID_ROWS - 1][c] = { type: 'block', id: 'grass' };
+    grid[GRID_ROWS - 2][c] = { type: 'block', id: 'grass' };
+  }
 }
 
 function centerCamera() {
+  // Fit full grid height in canvas (Mario Maker: see the whole height)
+  camera.zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, canvas.height / (BASE_CELL * GRID_ROWS)));
   const cs = BASE_CELL * camera.zoom;
-  camera.x = GRID_SIZE / 2 - canvas.width  / (2 * cs);
-  camera.y = GRID_SIZE / 2 - canvas.height / (2 * cs);
+  camera.x = Math.max(0, GRID_COLS / 2 - canvas.width  / (2 * cs));
+  camera.y = 0;
   clampCamera();
 }
 
 function clampCamera() {
   const cs = BASE_CELL * camera.zoom;
-  camera.x = Math.max(0, Math.min(camera.x, Math.max(0, GRID_SIZE - canvas.width  / cs)));
-  camera.y = Math.max(0, Math.min(camera.y, Math.max(0, GRID_SIZE - canvas.height / cs)));
+  camera.x = Math.max(0, Math.min(camera.x, Math.max(0, GRID_COLS - canvas.width  / cs)));
+  camera.y = Math.max(0, Math.min(camera.y, Math.max(0, GRID_ROWS - canvas.height / cs)));
 }
 
 // ════════════════════════════════════════════
-//  SIDEBAR
+//  BOTTOM PALETTE
 // ════════════════════════════════════════════
 
-function buildSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.innerHTML = '';
+function buildPalette() {
+  const tabsEl = document.getElementById('palette-tabs');
+  tabsEl.innerHTML = '';
 
-  CATEGORIES.forEach(cat => {
-    const isCharCat = (cat.id === 'characters');
-    const section   = document.createElement('div');
-    section.className = 'palette-section';
-
-    const header = document.createElement('div');
-    header.className = 'palette-header';
-    header.textContent = cat.label;
-    section.appendChild(header);
-
-    const grid = document.createElement('div');
-    grid.className = 'block-grid';
-
-    cat.keys.forEach(key => {
-      const def = isCharCat ? CHAR_DEFS[key] : BLOCK_DEFS[key];
-      if (!def) return;
-
-      const item = document.createElement('div');
-      item.className = 'block-item' + (isCharCat ? ' is-char' : '');
-      item.dataset.key = key;
-      if (key === selectedTool) item.classList.add('selected');
-
-      const em = document.createElement('span');
-      em.className = 'block-emoji';
-      em.textContent = def.emoji;
-
-      const lb = document.createElement('span');
-      lb.className = 'block-label';
-      lb.textContent = def.label;
-
-      item.append(em, lb);
-      item.addEventListener('click', () => selectTool(key, isCharCat));
-      item.addEventListener('mouseenter', e => showTooltip(e, def.label));
-      item.addEventListener('mouseleave', hideTooltip);
-      grid.appendChild(item);
+  CATEGORIES.forEach((cat, i) => {
+    const tab = document.createElement('button');
+    tab.className = 'palette-tab' + (i === 0 ? ' active' : '');
+    tab.dataset.cat = cat.id;
+    tab.textContent = cat.label;
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.palette-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderPaletteItems(cat);
     });
+    tabsEl.appendChild(tab);
+  });
 
-    section.appendChild(grid);
-    sidebar.appendChild(section);
+  renderPaletteItems(CATEGORIES[0]);
+}
+
+function renderPaletteItems(cat) {
+  const itemsEl   = document.getElementById('palette-items');
+  const isCharCat = (cat.id === 'characters');
+  itemsEl.innerHTML = '';
+
+  cat.keys.forEach(key => {
+    const def = isCharCat ? CHAR_DEFS[key] : BLOCK_DEFS[key];
+    if (!def) return;
+
+    const item = document.createElement('div');
+    item.className = 'palette-item' + (isCharCat ? ' is-char' : '');
+    item.dataset.key = key;
+    if (key === selectedTool) item.classList.add('selected');
+
+    const em = document.createElement('span');
+    em.className = 'item-emoji';
+    em.textContent = def.emoji;
+
+    const lb = document.createElement('span');
+    lb.className = 'item-label';
+    lb.textContent = def.label;
+
+    item.append(em, lb);
+    item.addEventListener('click', () => selectTool(key, isCharCat));
+    item.addEventListener('mouseenter', e => showTooltip(e, def.label));
+    item.addEventListener('mouseleave', hideTooltip);
+    itemsEl.appendChild(item);
   });
 }
 
 function selectTool(key, isChar) {
   selectedTool = key;
   isCharTool   = isChar;
-  document.querySelectorAll('.block-item').forEach(el => {
+  document.querySelectorAll('.palette-item').forEach(el => {
     el.classList.toggle('selected', el.dataset.key === key);
   });
 }
@@ -568,8 +595,8 @@ function render() {
 
   const c0 = Math.max(0, Math.floor(camera.x));
   const r0 = Math.max(0, Math.floor(camera.y));
-  const c1 = Math.min(GRID_SIZE - 1, Math.ceil(camera.x + W / cs));
-  const r1 = Math.min(GRID_SIZE - 1, Math.ceil(camera.y + H / cs));
+  const c1 = Math.min(GRID_COLS - 1, Math.ceil(camera.x + W / cs));
+  const r1 = Math.min(GRID_ROWS - 1, Math.ceil(camera.y + H / cs));
 
   // Draw cells
   for (let r = r0; r <= r1; r++) {
@@ -750,14 +777,14 @@ function rrect(ctx, x, y, w, h, r) {
 function renderMinimap() {
   const mw = miniCanvas.width;
   const mh = miniCanvas.height;
-  const cw = mw / GRID_SIZE;
-  const ch = mh / GRID_SIZE;
+  const cw = mw / GRID_COLS;
+  const ch = mh / GRID_ROWS;
 
   miniCtx.fillStyle = '#2E7D32';
   miniCtx.fillRect(0, 0, mw, mh);
 
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
+  for (let r = 0; r < GRID_ROWS; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
       const cell = grid[r][c];
       if (!cell) continue;
       const def = cell.type === 'character' ? CHAR_DEFS[cell.id] : BLOCK_DEFS[cell.id];
@@ -852,7 +879,7 @@ function screenToGrid(sx, sy) {
 }
 
 function inGrid(row, col) {
-  return row >= 0 && row < GRID_SIZE && col >= 0 && col < GRID_SIZE;
+  return row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS;
 }
 
 function onMouseDown(e) {
@@ -1117,8 +1144,8 @@ function buildStory() {
   const texts  = [];
   const envSet = new Set();
 
-  for (let r = 0; r < GRID_SIZE; r++) {
-    for (let c = 0; c < GRID_SIZE; c++) {
+  for (let r = 0; r < GRID_ROWS; r++) {
+    for (let c = 0; c < GRID_COLS; c++) {
       const cell = grid[r][c];
       if (!cell) continue;
       if (cell.type === 'character') {
@@ -1201,140 +1228,140 @@ function fill(r1, c1, r2, c2, id) {
 }
 
 function pForest() {
-  fill(0, 0, 39, 39, 'grass');
+  fill(0, 0, 15, 39, 'grass');
   // Dense trees
-  for (let r = 1; r < 39; r += 3)
-    for (let c = 1; c < 39; c += 3)
+  for (let r = 0; r < 15; r += 2)
+    for (let c = 0; c < 40; c += 3)
       if ((r + c) % 5 !== 0) bl(r, c, 'forest');
   // Clearing with path
-  for (let c = 0; c < 40; c++) bl(19, c, 'road');
-  for (let r = 0; r < 40; r++) bl(r, 19, 'road');
+  for (let c = 0; c < 40; c++) bl(8, c, 'road');
+  for (let r = 0; r < 16; r++) bl(r, 19, 'road');
   // Flowers along path
-  [[18,5],[20,10],[18,25],[20,32],[5,18],[12,20],[30,18]].forEach(([r,c]) => bl(r, c, 'flower'));
+  [[7,5],[9,10],[7,25],[9,32],[5,18],[12,20]].forEach(([r,c]) => bl(r, c, 'flower'));
   // Characters
-  ch(17, 17, 'fairy',  'Lilya',   'Bienvenue dans ma forêt magique !');
-  ch(22, 22, 'fox',    'Renardo', 'Je connais chaque arbre ici.');
-  ch( 8, 28, 'wizard', 'Merlin',  '');
+  ch(7, 17, 'fairy',  'Lilya',   'Bienvenue dans ma forêt magique !');
+  ch(10, 22, 'fox',   'Renardo', 'Je connais chaque arbre ici.');
+  ch(3,  28, 'wizard','Merlin',  '');
   // Text
-  tx(1, 1, 'Il était une fois une forêt enchantée…');
-  tx(35, 35, 'Au bout du chemin se cachait un secret.');
+  tx(0, 1, 'Il était une fois une forêt enchantée…');
+  tx(14, 35, 'Au bout du chemin se cachait un secret.');
 }
 
 function pCastle() {
-  fill(0, 0, 39, 39, 'grass');
+  fill(0, 0, 15, 39, 'grass');
   // Moat
-  fill(8, 8, 31, 31, 'water');
+  fill(3, 8, 13, 31, 'water');
   // Castle ground
-  fill(11, 11, 28, 28, 'road');
+  fill(5, 11, 11, 28, 'road');
   // Main castle
-  [[14,17],[14,18],[14,19],[14,20],[14,21],[15,18],[15,20],[16,18],[16,19],[16,20]].forEach(([r,c]) => bl(r, c, 'castle'));
+  [[5,17],[5,18],[5,19],[5,20],[5,21],[6,18],[6,20],[7,18],[7,19],[7,20]].forEach(([r,c]) => bl(r, c, 'castle'));
   // Towers
-  bl(12, 12, 'tower'); bl(12, 26, 'tower'); bl(26, 12, 'tower'); bl(26, 26, 'tower');
-  // Path over moat
-  for (let r = 32; r < 40; r++) bl(r, 19, 'road');
+  bl(3, 12, 'tower'); bl(3, 26, 'tower'); bl(12, 12, 'tower'); bl(12, 26, 'tower');
+  // Path
+  for (let r = 14; r < 16; r++) bl(r, 19, 'road');
   // Mountains
-  [[1,1],[1,35],[3,8],[3,30],[38,3],[37,37]].forEach(([r,c]) => bl(r, c, 'mountain'));
+  [[0,1],[0,35],[1,8],[1,30]].forEach(([r,c]) => bl(r, c, 'mountain'));
   // Characters
-  ch(15, 19, 'prince',   'Arthur',   'Bienvenue dans mon château !');
-  ch(20, 23, 'princess', 'Élodie',   'Quelle belle journée ensoleillée !');
-  ch(36, 19, 'hero',     'Vaillant', 'Je viens protéger le royaume !');
+  ch(6, 19, 'prince',   'Arthur',   'Bienvenue dans mon château !');
+  ch(9, 23, 'princess', 'Élodie',   'Quelle belle journée ensoleillée !');
+  ch(15, 19, 'hero',    'Vaillant', 'Je viens protéger le royaume !');
   // Text
   tx(0, 0, 'Le château brillait sous le soleil d\'or…');
-  tx(38, 0, 'La quête commençait ici.');
+  tx(14, 0, 'La quête commençait ici.');
 }
 
 function pIsland() {
-  fill(0, 0, 39, 39, 'water');
+  fill(0, 0, 15, 39, 'water');
   // Island
-  fill(7, 8, 32, 31, 'sand');
-  fill(11, 12, 28, 27, 'grass');
+  fill(3, 8, 13, 31, 'sand');
+  fill(5, 12, 11, 27, 'grass');
   // Trees
-  [[12,14],[13,22],[20,12],[22,27],[18,18],[15,25]].forEach(([r,c]) => bl(r, c, 'tree'));
+  [[5,14],[6,22],[9,12],[10,27],[8,18],[6,25]].forEach(([r,c]) => bl(r, c, 'tree'));
   // Treasure in the middle
-  bl(19, 19, 'treasure');
+  bl(8, 19, 'treasure');
   // Boats
-  bl(3, 18, 'boat'); bl(35, 20, 'boat'); bl(18, 3, 'boat');
+  bl(1, 18, 'boat'); bl(14, 20, 'boat'); bl(8, 3, 'boat');
   // Rocks at shore
-  [[7,8],[7,29],[31,9],[31,30]].forEach(([r,c]) => bl(r, c, 'rock'));
+  [[3,8],[3,29],[13,9],[13,30]].forEach(([r,c]) => bl(r, c, 'rock'));
   // Sun
-  bl(1, 37, 'sun');
+  bl(0, 37, 'sun');
   // Characters
-  ch(17, 17, 'hero',    'Marco',   'Le trésor est caché ici !');
-  ch(23, 25, 'wolf',    'Pirate',  'Ces îles m\'appartiennent !');
-  ch(4,  4,  'mermaid', 'Ondine',  'La mer garde bien ses secrets…');
+  ch(7, 17, 'hero',    'Marco',   'Le trésor est caché ici !');
+  ch(10, 25, 'wolf',   'Pirate',  'Ces îles m\'appartiennent !');
+  ch(2,  4,  'mermaid','Ondine',  'La mer garde bien ses secrets…');
   // Text
   tx(0, 0, 'Une île mystérieuse au milieu de l\'océan…');
-  tx(35, 33, 'X marque l\'emplacement du trésor.');
+  tx(14, 33, 'X marque l\'emplacement du trésor.');
 }
 
 function pSpace() {
-  fill(0, 0, 39, 39, 'stars');
+  fill(0, 0, 15, 39, 'stars');
   // Clouds as planets
-  [[4,4],[5,28],[15,6],[22,32],[33,14],[10,19]].forEach(([r,c]) => bl(r, c, 'cloud'));
+  [[1,4],[2,28],[6,6],[9,32],[13,14],[4,19]].forEach(([r,c]) => bl(r, c, 'cloud'));
   // Landing pad
-  fill(17, 16, 22, 24, 'road');
+  fill(7, 16, 9, 24, 'road');
   // Sun as alien star
-  bl(2, 35, 'sun');
+  bl(0, 35, 'sun');
   // Rainbow as nebula
-  bl(28, 28, 'rainbow'); bl(8, 8, 'rainbow');
+  bl(12, 28, 'rainbow'); bl(3, 8, 'rainbow');
   // Asteroids
-  [[3,11],[7,22],[14,3],[24,36],[37,7]].forEach(([r,c]) => bl(r, c, 'rock'));
+  [[1,11],[3,22],[5,3],[10,36],[14,7]].forEach(([r,c]) => bl(r, c, 'rock'));
   // Characters
-  ch(20, 20, 'astronaut', 'Nova',      'Mission accomplie ! Base atteinte.');
-  ch(25, 30, 'robot',     'R-2X7',     'Bip boup, bonjour !');
-  ch(10, 14, 'dragon',    'Cosmosfire','Je règne sur cette planète !');
+  ch(8, 20, 'astronaut', 'Nova',       'Mission accomplie ! Base atteinte.');
+  ch(11, 30, 'robot',    'R-2X7',      'Bip boup, bonjour !');
+  ch(4, 14,  'dragon',   'Cosmosfire', 'Je règne sur cette planète !');
   // Text
   tx(0, 0, 'Dans une galaxie très très lointaine…');
-  tx(38, 38, 'La mission de sauvetage commence !');
+  tx(14, 37, 'La mission commence !');
 }
 
 function pVillage() {
-  fill(0, 0, 39, 39, 'grass');
+  fill(0, 0, 15, 39, 'grass');
   // Roads crossing
-  for (let c = 0; c < 40; c++) { bl(14, c, 'road'); bl(26, c, 'road'); }
-  for (let r = 0; r < 40; r++) { bl(r, 14, 'road'); bl(r, 26, 'road'); }
+  for (let c = 0; c < 40; c++) { bl(5, c, 'road'); bl(11, c, 'road'); }
+  for (let r = 0; r < 16; r++) { bl(r, 14, 'road'); bl(r, 26, 'road'); }
   // Buildings
-  bl(5,  5,  'house');  bl(5,  18, 'school'); bl(5,  30, 'shop');
-  bl(18, 5,  'house');  bl(18, 18, 'castle'); bl(18, 30, 'house');
-  bl(30, 5,  'cabin');  bl(30, 18, 'house');  bl(30, 30, 'shop');
-  bl(2,  2,  'tower');  bl(2,  37, 'tower');  bl(37, 2, 'tower'); bl(37, 37, 'tower');
+  bl(2,  5,  'house');  bl(2,  18, 'school'); bl(2,  30, 'shop');
+  bl(8,  5,  'house');  bl(8,  18, 'castle'); bl(8,  30, 'house');
+  bl(13, 5,  'cabin');  bl(13, 18, 'house');  bl(13, 30, 'shop');
+  bl(0,  2,  'tower');  bl(0,  37, 'tower');  bl(15, 2, 'tower'); bl(15, 37, 'tower');
   // Trees & flowers
-  [[2,10],[12,2],[12,37],[37,10],[37,30],[8,8]].forEach(([r,c]) => bl(r, c, 'tree'));
-  [[3,20],[20,3],[36,36],[10,10],[6,25]].forEach(([r,c]) => bl(r, c, 'flower'));
+  [[0,10],[15,10],[15,30]].forEach(([r,c]) => bl(r, c, 'tree'));
+  [[1,20],[8,3],[14,36]].forEach(([r,c]) => bl(r, c, 'flower'));
   // Characters
-  ch(10, 10, 'hero',   'Luc',       'Bonjour tout le monde !');
-  ch(20, 20, 'fairy',  'Clochette', 'Quelle belle journée !');
-  ch(32, 8,  'wizard', 'Gandalf',   '');
+  ch(4, 10, 'hero',   'Luc',       'Bonjour tout le monde !');
+  ch(8, 20, 'fairy',  'Clochette', 'Quelle belle journée !');
+  ch(13, 8, 'wizard', 'Gandalf',   '');
   // Text
   tx(0, 0, 'Un village paisible au cœur du pays…');
-  tx(38, 38, 'Le marché bat son plein aujourd\'hui.');
+  tx(15, 38, 'Le marché bat son plein.');
 }
 
 function pSnow() {
-  fill(0, 0, 39, 39, 'snow');
+  fill(0, 0, 15, 39, 'snow');
   // Frozen river
-  for (let c = 5; c < 35; c++) bl(20, c, 'water');
+  for (let c = 5; c < 35; c++) bl(9, c, 'water');
   // Road bridge
-  bl(20, 17, 'road'); bl(20, 18, 'road'); bl(20, 19, 'road'); bl(20, 20, 'road'); bl(20, 21, 'road');
+  bl(9, 17, 'road'); bl(9, 18, 'road'); bl(9, 19, 'road'); bl(9, 20, 'road'); bl(9, 21, 'road');
   // Main path
-  for (let r = 0; r < 40; r++) { if (r !== 20) bl(r, 19, 'road'); }
+  for (let r = 0; r < 16; r++) { if (r !== 9) bl(r, 19, 'road'); }
   // Mountains
-  [[1,1],[2,8],[4,16],[1,28],[3,36],[38,4],[37,20],[39,34]].forEach(([r,c]) => bl(r, c, 'mountain'));
+  [[0,1],[1,8],[1,16],[0,28],[1,36],[15,4],[14,20],[15,34]].forEach(([r,c]) => bl(r, c, 'mountain'));
   // Clouds
-  [[5,10],[7,30],[13,38]].forEach(([r,c]) => bl(r, c, 'cloud'));
+  [[2,10],[3,30],[5,38]].forEach(([r,c]) => bl(r, c, 'cloud'));
   // Stars in sky
-  [[0,4],[1,15],[0,30],[1,38]].forEach(([r,c]) => bl(r, c, 'stars'));
+  [[0,4],[0,15],[0,30],[0,38]].forEach(([r,c]) => bl(r, c, 'stars'));
   // Buildings
-  bl(9,  9,  'cabin'); bl(28, 28, 'cabin'); bl(14, 17, 'castle');
+  bl(4,  9,  'cabin'); bl(12, 28, 'cabin'); bl(6, 17, 'castle');
   // Campfire
-  bl(28, 22, 'campfire');
+  bl(12, 22, 'campfire');
   // Characters
-  ch(13, 17, 'princess', 'Elsa',   'Le froid ne m\'affecte pas !');
-  ch(23, 23, 'ogre',     'Boron',  'Grrrr, il fait si froid !');
-  ch(7,  7,  'wolf',     'Fenrir', '');
+  ch(5,  17, 'princess', 'Elsa',   'Le froid ne m\'affecte pas !');
+  ch(10, 23, 'ogre',     'Boron',  'Grrrr, il fait si froid !');
+  ch(3,   7, 'wolf',     'Fenrir', '');
   // Text
   tx(0, 0, 'Un royaume gelé sous la neige éternelle…');
-  tx(38, 35, 'Seul l\'amour peut faire fondre la glace.');
+  tx(15, 35, 'Seul l\'amour peut faire fondre la glace.');
 }
 
 // ════════════════════════════════════════════
@@ -1355,8 +1382,8 @@ function loadFromStorage() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
     const data = JSON.parse(raw);
-    if (data.grid && Array.isArray(data.grid) && data.grid.length === GRID_SIZE) {
-      grid = data.grid.map(row => Array.isArray(row) ? row.map(cell => cell ? { ...cell } : null) : Array(GRID_SIZE).fill(null));
+    if (data.grid && Array.isArray(data.grid) && data.grid.length === GRID_ROWS) {
+      grid = data.grid.map(row => Array.isArray(row) ? row.slice(0, GRID_COLS).map(cell => cell ? { ...cell } : null) : Array(GRID_COLS).fill(null));
       if (data.camera) {
         camera.x    = data.camera.x    || 0;
         camera.y    = data.camera.y    || 0;
