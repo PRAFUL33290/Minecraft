@@ -1228,14 +1228,14 @@ function fill(r1, c1, r2, c2, id) {
 }
 
 function pForest() {
-  fill(0, 0, 15, 39, 'grass');
+  fill(0, 0, GRID_ROWS-1, GRID_COLS-1, 'grass');
   // Dense trees
-  for (let r = 0; r < 15; r += 2)
-    for (let c = 0; c < 40; c += 3)
+  for (let r = 0; r < GRID_ROWS-2; r += 2)
+    for (let c = 0; c < GRID_COLS; c += 3)
       if ((r + c) % 5 !== 0) bl(r, c, 'forest');
   // Clearing with path
-  for (let c = 0; c < 40; c++) bl(8, c, 'road');
-  for (let r = 0; r < 16; r++) bl(r, 19, 'road');
+  for (let c = 0; c < GRID_COLS; c++) bl(8, c, 'road');
+  for (let r = 0; r < GRID_ROWS-2; r++) bl(r, 19, 'road');
   // Flowers along path
   [[7,5],[9,10],[7,25],[9,32],[5,18],[12,20]].forEach(([r,c]) => bl(r, c, 'flower'));
   // Characters
@@ -1244,11 +1244,11 @@ function pForest() {
   ch(3,  28, 'wizard','Merlin',  '');
   // Text
   tx(0, 1, 'Il était une fois une forêt enchantée…');
-  tx(14, 35, 'Au bout du chemin se cachait un secret.');
+  tx(GRID_ROWS-4, GRID_COLS-6, 'Au bout du chemin se cachait un secret.');
 }
 
 function pCastle() {
-  fill(0, 0, 15, 39, 'grass');
+  fill(0, 0, GRID_ROWS-1, GRID_COLS-1, 'grass');
   // Moat
   fill(3, 8, 13, 31, 'water');
   // Castle ground
@@ -1258,20 +1258,20 @@ function pCastle() {
   // Towers
   bl(3, 12, 'tower'); bl(3, 26, 'tower'); bl(12, 12, 'tower'); bl(12, 26, 'tower');
   // Path
-  for (let r = 14; r < 16; r++) bl(r, 19, 'road');
+  for (let r = GRID_ROWS-4; r < GRID_ROWS-2; r++) bl(r, 19, 'road');
   // Mountains
   [[0,1],[0,35],[1,8],[1,30]].forEach(([r,c]) => bl(r, c, 'mountain'));
   // Characters
-  ch(6, 19, 'prince',   'Arthur',   'Bienvenue dans mon château !');
-  ch(9, 23, 'princess', 'Élodie',   'Quelle belle journée ensoleillée !');
-  ch(15, 19, 'hero',    'Vaillant', 'Je viens protéger le royaume !');
+  ch(6, 19, 'prince',       'Arthur',   'Bienvenue dans mon château !');
+  ch(9, 23, 'princess',     'Élodie',   'Quelle belle journée ensoleillée !');
+  ch(GRID_ROWS-3, 19, 'hero','Vaillant', 'Je viens protéger le royaume !');
   // Text
   tx(0, 0, 'Le château brillait sous le soleil d\'or…');
-  tx(14, 0, 'La quête commençait ici.');
+  tx(GRID_ROWS-4, 0, 'La quête commençait ici.');
 }
 
 function pIsland() {
-  fill(0, 0, 15, 39, 'water');
+  fill(0, 0, GRID_ROWS-1, GRID_COLS-1, 'water');
   // Island
   fill(3, 8, 13, 31, 'sand');
   fill(5, 12, 11, 27, 'grass');
@@ -1280,73 +1280,74 @@ function pIsland() {
   // Treasure in the middle
   bl(8, 19, 'treasure');
   // Boats
-  bl(1, 18, 'boat'); bl(14, 20, 'boat'); bl(8, 3, 'boat');
+  bl(1, 18, 'boat'); bl(GRID_ROWS-4, 20, 'boat'); bl(8, 3, 'boat');
   // Rocks at shore
   [[3,8],[3,29],[13,9],[13,30]].forEach(([r,c]) => bl(r, c, 'rock'));
   // Sun
-  bl(0, 37, 'sun');
+  bl(0, GRID_COLS-3, 'sun');
   // Characters
   ch(7, 17, 'hero',    'Marco',   'Le trésor est caché ici !');
   ch(10, 25, 'wolf',   'Pirate',  'Ces îles m\'appartiennent !');
   ch(2,  4,  'mermaid','Ondine',  'La mer garde bien ses secrets…');
   // Text
   tx(0, 0, 'Une île mystérieuse au milieu de l\'océan…');
-  tx(14, 33, 'X marque l\'emplacement du trésor.');
+  tx(GRID_ROWS-4, GRID_COLS-7, 'X marque l\'emplacement du trésor.');
 }
 
 function pSpace() {
-  fill(0, 0, 15, 39, 'stars');
+  fill(0, 0, GRID_ROWS-1, GRID_COLS-1, 'stars');
   // Clouds as planets
   [[1,4],[2,28],[6,6],[9,32],[13,14],[4,19]].forEach(([r,c]) => bl(r, c, 'cloud'));
   // Landing pad
   fill(7, 16, 9, 24, 'road');
   // Sun as alien star
-  bl(0, 35, 'sun');
+  bl(0, GRID_COLS-5, 'sun');
   // Rainbow as nebula
   bl(12, 28, 'rainbow'); bl(3, 8, 'rainbow');
   // Asteroids
-  [[1,11],[3,22],[5,3],[10,36],[14,7]].forEach(([r,c]) => bl(r, c, 'rock'));
+  [[1,11],[3,22],[5,3],[10,36],[GRID_ROWS-4,7]].forEach(([r,c]) => bl(r, c, 'rock'));
   // Characters
   ch(8, 20, 'astronaut', 'Nova',       'Mission accomplie ! Base atteinte.');
   ch(11, 30, 'robot',    'R-2X7',      'Bip boup, bonjour !');
   ch(4, 14,  'dragon',   'Cosmosfire', 'Je règne sur cette planète !');
   // Text
   tx(0, 0, 'Dans une galaxie très très lointaine…');
-  tx(14, 37, 'La mission commence !');
+  tx(GRID_ROWS-4, GRID_COLS-3, 'La mission commence !');
 }
 
 function pVillage() {
-  fill(0, 0, 15, 39, 'grass');
+  fill(0, 0, GRID_ROWS-1, GRID_COLS-1, 'grass');
   // Roads crossing
-  for (let c = 0; c < 40; c++) { bl(5, c, 'road'); bl(11, c, 'road'); }
-  for (let r = 0; r < 16; r++) { bl(r, 14, 'road'); bl(r, 26, 'road'); }
+  for (let c = 0; c < GRID_COLS; c++) { bl(5, c, 'road'); bl(11, c, 'road'); }
+  for (let r = 0; r < GRID_ROWS-2; r++) { bl(r, 14, 'road'); bl(r, 26, 'road'); }
   // Buildings
   bl(2,  5,  'house');  bl(2,  18, 'school'); bl(2,  30, 'shop');
   bl(8,  5,  'house');  bl(8,  18, 'castle'); bl(8,  30, 'house');
   bl(13, 5,  'cabin');  bl(13, 18, 'house');  bl(13, 30, 'shop');
-  bl(0,  2,  'tower');  bl(0,  37, 'tower');  bl(15, 2, 'tower'); bl(15, 37, 'tower');
+  bl(0,  2,  'tower');  bl(0,  GRID_COLS-3, 'tower');
+  bl(GRID_ROWS-3, 2, 'tower'); bl(GRID_ROWS-3, GRID_COLS-3, 'tower');
   // Trees & flowers
-  [[0,10],[15,10],[15,30]].forEach(([r,c]) => bl(r, c, 'tree'));
-  [[1,20],[8,3],[14,36]].forEach(([r,c]) => bl(r, c, 'flower'));
+  [[0,10],[GRID_ROWS-3,10],[GRID_ROWS-3,30]].forEach(([r,c]) => bl(r, c, 'tree'));
+  [[1,20],[8,3],[GRID_ROWS-4,GRID_COLS-4]].forEach(([r,c]) => bl(r, c, 'flower'));
   // Characters
   ch(4, 10, 'hero',   'Luc',       'Bonjour tout le monde !');
   ch(8, 20, 'fairy',  'Clochette', 'Quelle belle journée !');
   ch(13, 8, 'wizard', 'Gandalf',   '');
   // Text
   tx(0, 0, 'Un village paisible au cœur du pays…');
-  tx(15, 38, 'Le marché bat son plein.');
+  tx(GRID_ROWS-3, GRID_COLS-3, 'Le marché bat son plein.');
 }
 
 function pSnow() {
-  fill(0, 0, 15, 39, 'snow');
+  fill(0, 0, GRID_ROWS-1, GRID_COLS-1, 'snow');
   // Frozen river
   for (let c = 5; c < 35; c++) bl(9, c, 'water');
   // Road bridge
   bl(9, 17, 'road'); bl(9, 18, 'road'); bl(9, 19, 'road'); bl(9, 20, 'road'); bl(9, 21, 'road');
   // Main path
-  for (let r = 0; r < 16; r++) { if (r !== 9) bl(r, 19, 'road'); }
+  for (let r = 0; r < GRID_ROWS-2; r++) { if (r !== 9) bl(r, 19, 'road'); }
   // Mountains
-  [[0,1],[1,8],[1,16],[0,28],[1,36],[15,4],[14,20],[15,34]].forEach(([r,c]) => bl(r, c, 'mountain'));
+  [[0,1],[1,8],[1,16],[0,28],[1,36],[GRID_ROWS-3,4],[GRID_ROWS-4,20],[GRID_ROWS-3,34]].forEach(([r,c]) => bl(r, c, 'mountain'));
   // Clouds
   [[2,10],[3,30],[5,38]].forEach(([r,c]) => bl(r, c, 'cloud'));
   // Stars in sky
@@ -1361,7 +1362,7 @@ function pSnow() {
   ch(3,   7, 'wolf',     'Fenrir', '');
   // Text
   tx(0, 0, 'Un royaume gelé sous la neige éternelle…');
-  tx(15, 35, 'Seul l\'amour peut faire fondre la glace.');
+  tx(GRID_ROWS-3, GRID_COLS-5, 'Seul l\'amour peut faire fondre la glace.');
 }
 
 // ════════════════════════════════════════════
@@ -1383,7 +1384,11 @@ function loadFromStorage() {
     if (!raw) return false;
     const data = JSON.parse(raw);
     if (data.grid && Array.isArray(data.grid) && data.grid.length === GRID_ROWS) {
-      grid = data.grid.map(row => Array.isArray(row) ? row.slice(0, GRID_COLS).map(cell => cell ? { ...cell } : null) : Array(GRID_COLS).fill(null));
+      grid = data.grid.slice(0, GRID_ROWS).map(row =>
+        Array.isArray(row) ? row.slice(0, GRID_COLS).map(cell => cell ? { ...cell } : null) : Array(GRID_COLS).fill(null)
+      );
+      // Pad if fewer rows than expected
+      while (grid.length < GRID_ROWS) grid.push(Array(GRID_COLS).fill(null));
       if (data.camera) {
         camera.x    = data.camera.x    || 0;
         camera.y    = data.camera.y    || 0;
